@@ -119,9 +119,10 @@
       main {
         display: flex;
         flex-direction: column;
+        width: 100%;
+        min-width: 0;
         min-height: 100vh;
         padding: 0.85rem 1.35rem 0.85rem 0.35rem;
-        max-width: 1080px;
       }
       .brand {
         display: flex;
@@ -161,7 +162,7 @@
         font-size: 1.15rem;
       }
       .lede {
-        max-width: 40rem;
+        max-width: 100%;
         margin: 0.4rem 0 0;
         font-size: 0.84rem;
         line-height: 1.4;
@@ -173,6 +174,11 @@
         color: rgba(255, 255, 255, 0.9);
       }
       .lede strong { color: white; font-weight: 600; }
+      header,
+      .panel {
+        width: 100%;
+        min-width: 0;
+      }
       .panel {
         margin-top: 0.7rem;
         padding: 1rem 1.1rem 1.05rem;
@@ -267,12 +273,15 @@
       #status-message[data-tone="success"] { color: #e7fff3; }
       .layout {
         display: grid;
+        width: 100%;
+        min-width: 0;
         gap: 0.7rem;
         margin-top: 0.7rem;
         align-items: start;
+        grid-template-columns: minmax(0, 1fr);
       }
       @media (min-width: 860px) {
-        .layout { grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.8fr); }
+        .layout { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
       }
       .card-title {
         margin: 0;
@@ -759,6 +768,7 @@
         .gloss:hover:not(:disabled) { transform: none; }
       }
       @media (max-width: 720px) {
+        #status-steps { grid-template-columns: 1fr; gap: 0.45rem; }
         .poster { grid-template-columns: 1fr; padding-top: 7.25rem; }
         .spine { justify-content: flex-start; padding: 1.1rem 1.1rem 0; }
         .spine-word {
