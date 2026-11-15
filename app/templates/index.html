@@ -42,6 +42,23 @@
         overflow: hidden;
         padding-top: 4.5rem;
       }
+      .credit {
+        position: fixed;
+        top: 0.85rem;
+        right: 1.15rem;
+        z-index: 40;
+        margin: 0;
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.72);
+        pointer-events: none;
+      }
+      .credit strong {
+        font-family: Oswald, "Arial Narrow", sans-serif;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        color: white;
+      }
       .logo {
         position: absolute;
         z-index: 0;
@@ -56,13 +73,19 @@
       .spine,
       main { position: relative; z-index: 1; }
       .spine {
+        position: static;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        padding: 1.5rem 0;
+        padding: 0;
       }
       .spine-word {
+        position: absolute;
+        top: 33%;
+        left: 4.125rem;
+        z-index: 2;
         margin: 0;
+        transform: translateX(-50%);
         writing-mode: vertical-lr;
         font-family: Oswald, "Arial Narrow", sans-serif;
         font-weight: 700;
@@ -282,6 +305,7 @@
       }
       @media (min-width: 860px) {
         .layout { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
+        .guide-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
       }
       .card-title {
         margin: 0;
@@ -470,6 +494,71 @@
         border: 1px solid #e7c9d1;
         padding: 0.45rem 0.55rem;
         vertical-align: top;
+      }
+      .guide { margin-top: 2.75rem; }
+      .guide-lead {
+        margin: 0.35rem 0 0;
+        max-width: 62rem;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+      .guide-steps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.7rem;
+        margin: 0.85rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .guide-steps li {
+        min-width: 0;
+        padding: 0.75rem 0.8rem;
+        border-radius: 0.85rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+      }
+      .guide-steps strong {
+        display: block;
+        margin-bottom: 0.2rem;
+        font-family: Oswald, sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--pink);
+      }
+      .guide-steps span {
+        font-size: 0.86rem;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+      .guide-grid {
+        display: grid;
+        gap: 0.9rem 1.2rem;
+        margin-top: 0.95rem;
+      }
+      .guide h3 {
+        margin: 0 0 0.4rem;
+        font-family: Oswald, sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: white;
+      }
+      .guide ul {
+        margin: 0;
+        padding-left: 1.05rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.45;
+      }
+      .guide li + li { margin-top: 0.35rem; }
+      .guide code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.84em;
+        color: #ffe4ec;
       }
       .foot { margin: auto 0 0; padding-top: 0.7rem; }
       .ticker {
@@ -768,15 +857,21 @@
         .gloss:hover:not(:disabled) { transform: none; }
       }
       @media (max-width: 720px) {
-        #status-steps { grid-template-columns: 1fr; gap: 0.45rem; }
+        #status-steps,
+        .guide-steps { grid-template-columns: 1fr; gap: 0.45rem; }
         .poster { grid-template-columns: 1fr; padding-top: 7.25rem; }
         .spine { justify-content: flex-start; padding: 1.1rem 1.1rem 0; }
         .spine-word {
+          position: static;
+          top: auto;
+          left: auto;
+          transform: none;
           writing-mode: horizontal-tb;
           font-size: 4.4rem;
         }
         main { padding: 0.6rem 1.1rem 2rem; }
         .brand { justify-content: flex-start; }
+        .credit { top: 7.35rem; right: 1rem; }
         .logo {
           top: -1.5rem;
           right: -3rem;
@@ -787,6 +882,7 @@
     </style>
   </head>
   <body>
+    <p class="credit">powered by <strong>BULZ</strong></p>
     <div class="player-bars" id="player-bars" aria-hidden="true"></div>
     <section class="player" id="player" aria-label="Music player" data-base="{{ url_for('static', filename='music/Browsing_After_Hours.mp3') }}">
       <div class="player-art-wrap">
@@ -900,6 +996,39 @@
             <a id="download-link" class="gloss gloss-light" href="#">Download .docx</a>
           </div>
           <div id="preview"></div>
+        </section>
+
+        <section class="panel guide" aria-labelledby="guide-title">
+          <h2 id="guide-title" class="card-title">placeholder guide</h2>
+          <p class="guide-lead">Use this before you drop in a Word template. The checker only replaces tags it can read, then writes <strong>GAY100%</strong> in red.</p>
+          <ol class="guide-steps">
+            <li><strong>1 Upload</strong><span>Drop a .docx file, or click the box. Word templates only, up to 16 MB.</span></li>
+            <li><strong>2 Check</strong><span>Run D-GAY Checker. The variables list shows every placeholder that was found.</span></li>
+            <li><strong>3 Yield</strong><span>Read the preview, then download the document with each placeholder replaced.</span></li>
+          </ol>
+          <div class="guide-grid">
+            <div>
+              <h3>How a placeholder has to look</h3>
+              <ul>
+                <li>Write it as <code>&#123;&#123; name &#125;&#125;</code>. <code>&#123;&#123;name&#125;&#125;</code> is the same tag. Spaces around the name are fine.</li>
+                <li>Start the name with a letter or <code>_</code>. After that, use letters, digits, or <code>_</code>.</li>
+                <li><code>&#123;&#123; user.email &#125;&#125;</code> reads a value inside an object. <code>&#123;&#123; amount|upper &#125;&#125;</code> adds a filter.</li>
+                <li><code>&#123;&#123; item.label &#125;&#125;</code> works inside <code>&#123;% for item in items %&#125;</code>. The loop itself is not a placeholder.</li>
+                <li>A tag split across Word formatting is still found. The checker joins the text of the paragraph first.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Hyphens</h3>
+              <ul>
+                <li><code>&#123;&#123;site-24h&#125;&#125;</code> and <code>&#123;&#123;foo-bar&#125;&#125;</code> are recognized. The hyphen must sit directly between letters, digits, or underscores.</li>
+                <li>The variables list keeps the hyphen. While checking, <code>foo-bar</code> is read as <code>foo_bar</code> so the template can render. The download still shows GAY100%.</li>
+                <li><code>&#123;&#123; foo - bar &#125;&#125;</code> is not a name. The spaces make the hyphen a minus sign.</li>
+                <li><code>&#123;&#123;-&#125;&#125;</code> and <code>&#123;&#123; - &#125;&#125;</code> are not placeholders. A hyphen by itself has no name.</li>
+                <li><code>&#123;&#123; 24hours &#125;&#125;</code> and <code>&#123;&#123; my name &#125;&#125;</code> are skipped. A name cannot start with a digit or contain a space.</li>
+                <li>A hyphen inside <code>&#123;% for item in foo-bar %&#125;</code> is not rewritten. Hyphens are only accepted inside <code>&#123;&#123; &#125;&#125;</code> tags.</li>
+              </ul>
+            </div>
+          </div>
         </section>
 
         <div class="foot">
