@@ -94,17 +94,33 @@ def test_document_without_tags_still_previews(tmp_path):
 
 def test_hyphenated_placeholder_still_previews(tmp_path):
     document = Document()
-    document.add_paragraph("Duty {{notdienst-24h_n_1}}")
+    document.add_paragraph("Duty {{notdienst_24h_n_1}}")
     source = tmp_path / "alarm.docx"
     dest = tmp_path / "alarm_out.docx"
     document.save(source)
 
     result = process_template(source, dest)
 
-    assert "notdienst-24h_n_1" in result["labels"]
+    assert "notdienst_24h_n_1" in result["labels"]
     assert "<mark>GAY100%</mark>" in result["preview_html"]
     assert dest.exists()
     assert Document(dest).paragraphs[0].text == "Duty " + MARKER
+
+
+def test_operator_in_placeholder_is_not_rewritten(tmp_path):
+    document = Document()
+    document.add_paragraph("Duty {{foo-bar}} plus {{a+b}} set {{a=b}}")
+    source = tmp_path / "operators.docx"
+    dest = tmp_path / "operators_out.docx"
+    document.save(source)
+
+    try:
+        process_template(source, dest)
+    except TemplateCheckError as exc:
+        assert "foo-bar" in exc.labels
+    else:
+        raise AssertionError("expected a template error")
+    assert not dest.exists()
 
 
 def test_broken_tag_does_not_leave_a_download(tmp_path):

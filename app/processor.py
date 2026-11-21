@@ -101,12 +101,7 @@ class GayUndefined(ChainableUndefined):
 
 def process_template(src: Path, dest: Path) -> dict:
     labels, full_text = collect_labels(src)
-    render_src, rewritten_tags = jinja_source(src)
-    try:
-        return _render_checked(src, render_src, dest, labels, full_text, rewritten_tags)
-    finally:
-        if render_src != src:
-            render_src.unlink(missing_ok=True)
+    return _render_checked(src, src, dest, labels, full_text, 0)
 
 
 def _render_checked(src: Path, render_src: Path, dest: Path, labels: list[str], full_text: str, rewritten_tags: int) -> dict:
@@ -187,82 +182,6 @@ def label_covers(labels: list[str], name: str) -> bool:
         if head == norm or head.startswith(norm + ".") or head.startswith(norm + "["):
             return True
     return False
-
-
-def jinja_source(src: Path) -> tuple[Path, int]:
-    """Copy the docx and turn hyphenated {{ names }} into names Jinja can parse."""
-    env = Environment()
-    changed = 0
-
-    def fix_xml(data: bytes) -> bytes:
-        nonlocal changed
-        xml = data.decode("utf-8")
-        out: list[str] = []
-        cursor = 0
-        while True:
-            start = xml.find("{{", cursor)
-            if start < 0:
-                out.append(xml[cursor:])
-                break
-            end = xml.find("}}", start + 2)
-            if end < 0:
-                out.append(xml[cursor:])
-                break
-            chunk = xml[start:end + 2]
-            fixed = _rewrite_hyphenated_name(chunk)
-            if fixed != chunk:
-                try:
-                    env.parse(re.sub(r"<[^>]*>", "", fixed))
-                except TemplateError:
-                    fixed = chunk
-                else:
-                    changed += 1
-            out.append(xml[cursor:start])
-            out.append(fixed)
-            cursor = end + 2
-        return "".join(out).encode("utf-8")
-
-    temporary = src.with_name(src.name + ".jinja.docx")
-    with ZipFile(src, "r") as source, ZipFile(temporary, "w") as target:
-        for item in source.infolist():
-            data = source.read(item.filename)
-            if item.filename.startswith("word/") and item.filename.endswith(".xml"):
-                data = fix_xml(data)
-            info = ZipInfo(filename=item.filename, date_time=item.date_time)
-            info.compress_type = ZIP_DEFLATED
-            info.external_attr = item.external_attr
-            target.writestr(info, data)
-    if changed == 0:
-        temporary.unlink(missing_ok=True)
-        return src, 0
-    return temporary, changed
-
-
-def _rewrite_hyphenated_name(chunk: str) -> str:
-    """Turn name-name into name_name, including when Word splits the name across runs."""
-    pieces = re.split(r"(<[^>]*>)", chunk)
-    text_indexes = [index for index, piece in enumerate(pieces) if not piece.startswith("<")]
-    chars: list[str] = []
-    owners: list[tuple[int, int]] = []
-    for index in text_indexes:
-        for offset, char in enumerate(pieces[index]):
-            chars.append(char)
-            owners.append((index, offset))
-    if not re.search(r"[A-Za-z0-9_]-[A-Za-z0-9_]", "".join(chars)):
-        return chunk
-    buffers = {index: list(pieces[index]) for index in text_indexes}
-    for index, char in enumerate(chars):
-        if char != "-" or index == 0 or index + 1 == len(chars):
-            continue
-        left = chars[index - 1]
-        right = chars[index + 1]
-        if re.match(r"[A-Za-z0-9_]", left) and re.match(r"[A-Za-z0-9_]", right):
-            piece_index, offset = owners[index]
-            buffers[piece_index][offset] = "_"
-    rewritten = pieces[:]
-    for index, buffer in buffers.items():
-        rewritten[index] = "".join(buffer)
-    return "".join(rewritten)
 
 
 def build_context(labels: list[str], undeclared: set[str], full_text: str) -> dict:

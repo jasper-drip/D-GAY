@@ -1012,20 +1012,19 @@
               <ul>
                 <li>Write it as <code>&#123;&#123; name &#125;&#125;</code>. <code>&#123;&#123;name&#125;&#125;</code> is the same tag. Spaces around the name are fine.</li>
                 <li>Start the name with a letter or <code>_</code>. After that, use letters, digits, or <code>_</code>.</li>
+                <li>A placeholder name cannot contain <code>+</code>, <code>-</code>, or <code>=</code>. docxtpl uses Jinja, and a name may only contain letters, digits, or <code>_</code>, and it must start with a letter or <code>_</code>.</li>
                 <li><code>&#123;&#123; user.email &#125;&#125;</code> reads a value inside an object. <code>&#123;&#123; amount|upper &#125;&#125;</code> adds a filter.</li>
                 <li><code>&#123;&#123; item.label &#125;&#125;</code> works inside <code>&#123;% for item in items %&#125;</code>. The loop itself is not a placeholder.</li>
                 <li>A tag split across Word formatting is still found. The checker joins the text of the paragraph first.</li>
               </ul>
             </div>
             <div>
-              <h3>Hyphens</h3>
+              <h3>Not a name</h3>
               <ul>
-                <li><code>&#123;&#123;site-24h&#125;&#125;</code> and <code>&#123;&#123;foo-bar&#125;&#125;</code> are recognized. The hyphen must sit directly between letters, digits, or underscores.</li>
-                <li>The variables list keeps the hyphen. While checking, <code>foo-bar</code> is read as <code>foo_bar</code> so the template can render. The download still shows GAY100%.</li>
-                <li><code>&#123;&#123; foo - bar &#125;&#125;</code> is not a name. The spaces make the hyphen a minus sign.</li>
+                <li><code>&#123;&#123;foo-bar&#125;&#125;</code>, <code>&#123;&#123;a+b&#125;&#125;</code>, and <code>&#123;&#123;a=b&#125;&#125;</code> are not names. The checker does not rewrite them.</li>
+                <li><code>-</code> means minus, <code>+</code> means addition, and <code>=</code> is not allowed inside <code>&#123;&#123; &#125;&#125;</code>.</li>
                 <li><code>&#123;&#123;-&#125;&#125;</code> and <code>&#123;&#123; - &#125;&#125;</code> are not placeholders. A hyphen by itself has no name.</li>
                 <li><code>&#123;&#123; 24hours &#125;&#125;</code> and <code>&#123;&#123; my name &#125;&#125;</code> are skipped. A name cannot start with a digit or contain a space.</li>
-                <li>A hyphen inside <code>&#123;% for item in foo-bar %&#125;</code> is not rewritten. Hyphens are only accepted inside <code>&#123;&#123; &#125;&#125;</code> tags.</li>
               </ul>
             </div>
           </div>
